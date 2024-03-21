@@ -1,0 +1,7 @@
+{
+  "domain": "basestation",
+  "name": "Basestation",
+  "requirements": ["bleak==0.21.1"],
+  "iot_class": "assumed_state",
+  "version": "0.1.0"
+}
