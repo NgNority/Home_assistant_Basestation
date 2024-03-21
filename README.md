@@ -31,3 +31,6 @@ light:
 You can change the name and the MAC address accordingly.
 
 One more reboot and they should now show up in your Overview!
+
+## NOTE!
+After booting up, it might take a minute or two before the stations are found! Just wait a little bit and it should find them.
