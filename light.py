@@ -1,6 +1,8 @@
 """Platform for basestation integration."""
 from __future__ import annotations
 
+from .const import DOMAIN, MANUFACTURENAME
+
 import logging
 
 from .basestation import BasestationInstance
@@ -17,6 +19,7 @@ from homeassistant.const import CONF_NAME, CONF_MAC
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 from homeassistant.helpers.typing import ConfigType, DiscoveryInfoType
+from homeassistant.helpers.device_registry import DeviceInfo
 
 _LOGGER = logging.getLogger("basestation")
 
@@ -48,11 +51,16 @@ class BasestationLight(LightEntity):
     """Representation of an Basestation"""
 
     def __init__(self, light) -> None:
-        """Initialize an GodoxLight."""
-        _LOGGER.info(pformat(light))
-        self._light = BasestationInstance(light["mac"])
+        """Initialize an Basestation."""
+        self._mac = light["mac"]  # Store MAC address for use in unique ID
+        self._light = BasestationInstance(self._mac)
         self._name = light["name"]
         self._state = None
+
+    @property
+    def unique_id(self) -> str:
+        """Return a unique ID."""
+        return f"basestation_{self._mac}"
 
     @property
     def name(self) -> str:
@@ -66,7 +74,6 @@ class BasestationLight(LightEntity):
 
     async def async_turn_on(self, **kwargs: Any) -> None:
         """Instruct the basestation to turn on."""
-        
         await self._light.turn_on()
 
     async def async_turn_off(self, **kwargs: Any) -> None:
@@ -74,8 +81,17 @@ class BasestationLight(LightEntity):
         await self._light.turn_off()
 
     def update(self) -> None:
-        """Fetch new state data for this light.
-
-        This is the only method that should fetch new data for Home Assistant.
-        """
+        """Fetch new state data for this light."""
         self._state = self._light.is_on
+
+    @property
+    def device_info(self) -> DeviceInfo:
+        """Return the device info."""
+        return DeviceInfo(
+            identifiers={
+                (DOMAIN, self.unique_id)
+            },
+            name=self._name,
+            manufacturer=MANUFACTURENAME,
+            model="SteamVR Basestation",
+        )

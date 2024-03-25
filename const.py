@@ -1,0 +1,3 @@
+DOMAIN = "basestation"
+
+MANUFACTURENAME = "Valve"
