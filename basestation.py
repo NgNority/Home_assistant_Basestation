@@ -11,6 +11,8 @@ v2_Power_Char = "00001525-1212-efde-1523-785feabcd124"
 CMD_ON_V2 = b"\x01"
 CMD_OFF_V2 = b"\x00"
 
+PWR_CHARACTERISTIC = "00001525-1212-EFDE-1523-785FEABCD124"
+
 LOGGER = logging.getLogger(__name__)
 
 async def discover():
@@ -78,3 +80,18 @@ class BasestationInstance:
             await self._device.disconnect()
             self._connected = False
             LOGGER.debug(f"Disconnected from {self._device.address}")
+    
+    async def read_state(self):
+        if not self._connected:
+            await self.connect()
+
+        if self._connected:  # Ensure the device is connected before attempting to read
+            try:
+                state = await self._device.read_gatt_char(PWR_CHARACTERISTIC)
+                self._is_on = state != CMD_OFF_V2
+            except BleakError as e:
+                LOGGER.error(f"Error reading state from base station {self._mac}: {e}")
+        else:
+            LOGGER.error(f"Failed to connect to base station {self._mac}")
+
+        await self.disconnect()

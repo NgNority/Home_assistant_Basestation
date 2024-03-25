@@ -48,10 +48,10 @@ def setup_platform(
     add_entities([BasestationLight(light)])
 
 class BasestationLight(LightEntity):
-    """Representation of an Basestation"""
+    """Representation of a Basestation"""
 
     def __init__(self, light) -> None:
-        """Initialize an Basestation."""
+        """Initialize a Basestation."""
         self._mac = light["mac"]  # Store MAC address for use in unique ID
         self._light = BasestationInstance(self._mac)
         self._name = light["name"]
@@ -75,13 +75,16 @@ class BasestationLight(LightEntity):
     async def async_turn_on(self, **kwargs: Any) -> None:
         """Instruct the basestation to turn on."""
         await self._light.turn_on()
+        self._state = True
 
     async def async_turn_off(self, **kwargs: Any) -> None:
         """Instruct the basestation to turn off."""
         await self._light.turn_off()
+        self._state = False
 
-    def update(self) -> None:
-        """Fetch new state data for this light."""
+    async def async_added_to_hass(self) -> None:
+        """Fetch initial state when entity is added to Home Assistant."""
+        await self._light.read_state()
         self._state = self._light.is_on
 
     @property
@@ -95,3 +98,4 @@ class BasestationLight(LightEntity):
             manufacturer=MANUFACTURENAME,
             model="SteamVR Basestation",
         )
+

@@ -2,6 +2,6 @@
   "domain": "basestation",
   "name": "Basestation",
   "requirements": ["bleak==0.21.1"],
-  "iot_class": "assumed_state",
+  "iot_class": "local_polling",
   "version": "0.1.0"
 }
